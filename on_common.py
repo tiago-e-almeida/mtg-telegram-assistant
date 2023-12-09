@@ -38,24 +38,30 @@ def cards(update: Update, context: CallbackContext):
                                          text=strings.Card.card_not_found.format(name),
                                          parse_mode=telegram.ParseMode.MARKDOWN)
                 continue
-        del card.legalities()["penny"]
-        del card.legalities()["oldschool"]
-        del card.legalities()["future"]
-        del card.legalities()["duel"]
-        banned_in = [k for k, v in card.legalities().items() if v == "banned" or v == "not_legal"]
-        legal_in = [k for k, v in card.legalities().items() if v == "legal"]
+     
+
         legal_text = ""
-
-        if len(banned_in) == 0:
-            legal_text = strings.Card.card_legal
-        else:
-            footer_list.append(InlineKeyboardButton("Legalities", callback_data=card.name()))
-            for v in legal_in:
-                legal_text += ':white_check_mark: {}\n'.format(v)
-            for v in banned_in:
-                legal_text += ':no_entry: {}\n'.format(v)
-            cacheable.CACHED_LEGALITIES.update({card.name(): legal_text})
-
+        my_formatos = ['standard', 'explorer', 'pioneer', 'modern', 'legacy', 'pauper', 'commander', 'oathbreaker', 'vintage', 'alchemy', 'historic', 'brawl', 'historicbrawl', 'timeless']        
+        for formato in my_formatos:
+            cardLegality = card.legalities()[formato]
+            if(cardLegality == "banned"):
+                if(formato == "pauper" or formato == "vintage"):
+                  legal_text += ':no_entry_sign: {}\n\n'.format(formato)      
+                else:              
+                    legal_text += ':no_entry_sign: {}\n'.format(formato)
+            if(cardLegality == "not_legal"):
+                if(formato == "pauper" or formato == "vintage"):
+                  legal_text += ':radio_button: {}\n\n'.format(formato)      
+                else:              
+                    legal_text += ':radio_button: {}\n'.format(formato)                
+            if(cardLegality == "legal"):
+                if(formato == "pauper" or formato == "vintage"):
+                    legal_text += ':white_check_mark: {}\n\n'.format(formato)      
+                else:              
+                    legal_text += ':white_check_mark: {}\n'.format(formato)                    
+   
+        footer_list.append(InlineKeyboardButton("Legalities", callback_data=card.name()))
+        cacheable.CACHED_LEGALITIES.update({card.name(): legal_text})
         eur = '{}€'.format(card.prices(mode="eur")) if card.prices(mode="eur") is not None else "CardMarket"
         usd = '{}$'.format(card.prices(mode="usd")) if card.prices(mode="usd") is not None else "TCGPlayer"
         try:
@@ -169,6 +175,7 @@ def legalities(update: Update, context: CallbackContext):
     card_name = query.data
     if card_name in cacheable.CACHED_LEGALITIES.keys():
         logger.info(strings.Log.cached)
+        logging.error(cacheable.CACHED_LEGALITIES[card_name])
         context.bot.answer_callback_query(query.id,
                                           emojize(cacheable.CACHED_LEGALITIES[card_name], use_aliases=True),
                                           show_alert=True)
@@ -177,22 +184,22 @@ def legalities(update: Update, context: CallbackContext):
         logger.info(strings.Log.new_cache)
         asyncio.set_event_loop(asyncio.new_event_loop())
         card = scrython.cards.Named(exact=card_name)
-        del card.legalities()["penny"]
-        del card.legalities()["oldschool"]
-        del card.legalities()["future"]
-        del card.legalities()["duel"]
-        banned_in = [k for k, v in card.legalities().items() if v == "banned" or v == "not_legal"]
-        legal_in = [k for k, v in card.legalities().items() if v == "legal"]
+            
+
+        my_formatos = ['standard', 'explorer', 'pioneer', 'modern', 'legacy', 'pauper', 'commander', 'oathbreaker', 'vintage', 'alchemy', 'historic', 'brawl', 'historicbrawl', 'timeless']        
         legal_text = ""
-        if len(banned_in) == 0:
-            legal_text = strings.Card.card_legal
-        else:
-            for v in legal_in:
-                legal_text += ':white_check_mark: {}\n'.format(v)
-            for v in banned_in:
-                legal_text += ':no_entry: {}\n'.format(v)
-            cacheable.CACHED_LEGALITIES.update({card.name(): legal_text})
-            context.bot.answer_callback_query(query.id,
-                                              emojize(cacheable.CACHED_LEGALITIES[card_name], use_aliases=True),
-                                              show_alert=True)
-            query.answer()
+
+        for formato in my_formatos:
+            cardLegality = card.legalities()[formato]
+            if(cardLegality == "banned"):
+               legal_text += ':no_entry: {}\n'.format(formato)
+            if(cardLegality == "not_legal"):
+               legal_text += ':white_circle: {}\n'.format(formato)
+            if(cardLegality == "legal"):
+               legal_text += ':white_check_mark: {}\n'.format(formato)
+
+        cacheable.CACHED_LEGALITIES.update({card.name(): legal_text})
+        context.bot.answer_callback_query(query.id,
+                                            emojize(cacheable.CACHED_LEGALITIES[card_name], use_aliases=True),
+                                            show_alert=True)
+        query.answer()
