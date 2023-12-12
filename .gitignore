@@ -32,6 +32,6 @@ ENV/
 Thumbs.db
 
 # Ignore changes in config file
-/config/config.json
+config/config.json
 
 *.db
