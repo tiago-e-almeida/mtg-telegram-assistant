@@ -18,21 +18,29 @@ def cards(update: Update, context: CallbackContext):
     button_list = []
     footer_list = []
     header_list = []
+
     for index, name in enumerate(match):
         if index > max_cards:
             break
         try:
             card = scrython.cards.Named(fuzzy=name)
         except scrython.ScryfallError:
+            #print(scrython.ScryfallError.message())
             auto = scrython.cards.Autocomplete(q=name, query=name)
             if len(auto.data()) > 0:
-                text = ""
-                for index, item in zip(range(5), auto.data()):
-                    text += '`{}`\n'.format(item)
-                context.bot.send_message(chat_id=update.message.chat_id,
-                                         text=strings.Card.card_autocorrect.format(text),
-                                         parse_mode=telegram.ParseMode.MARKDOWN)
-                continue
+                if(len(auto.data()) == 1):
+                    uniqueName = auto.data()[0]
+                   # print(uniqueName)
+                    card = scrython.cards.Named(fuzzy=uniqueName)
+                    #print(card.scryfall_uri())
+                else:
+                    text = ""
+                    for index, item in zip(range(5), auto.data()):
+                        text += '`{}`\n'.format(item)
+                    context.bot.send_message(chat_id=update.message.chat_id,
+                                            text=strings.Card.card_autocorrect.format(text),
+                                            parse_mode=telegram.ParseMode.MARKDOWN)
+                    continue
             else:
                 context.bot.send_message(chat_id=update.message.chat_id,
                                          text=strings.Card.card_not_found.format(name),
@@ -41,7 +49,7 @@ def cards(update: Update, context: CallbackContext):
      
 
         legal_text = ""
-        my_formatos = ['standard', 'explorer', 'pioneer', 'modern', 'legacy', 'pauper', 'commander', 'oathbreaker', 'vintage', 'alchemy', 'historic', 'brawl', 'historicbrawl', 'timeless']        
+        my_formatos = ['standard', 'explorer', 'pioneer', 'modern', 'legacy', 'pauper', 'commander', 'oathbreaker', 'vintage', 'alchemy', 'historic', 'brawl', 'timeless']        
         for formato in my_formatos:
             cardLegality = card.legalities()[formato]
             if(cardLegality == "banned"):
