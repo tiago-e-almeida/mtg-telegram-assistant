@@ -36,7 +36,8 @@ def cards(update: Update, context: CallbackContext):
                 else:
                     text = ""
                     for index, item in zip(range(5), auto.data()):
-                        text += '`{}`\n'.format(item)
+                        #minor change to insert [[]] on suggestions made by the bot so the copy command makes more sense
+                        text += '`{}`\n'.format('[['+item+']]')
                     context.bot.send_message(chat_id=update.message.chat_id,
                                             text=strings.Card.card_autocorrect.format(text),
                                             parse_mode=telegram.ParseMode.MARKDOWN)
