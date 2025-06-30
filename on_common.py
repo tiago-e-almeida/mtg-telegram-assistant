@@ -195,7 +195,7 @@ def legalities(update: Update, context: CallbackContext):
         card = scrython.cards.Named(exact=card_name)
             
 
-        my_formatos = ['standard', 'explorer', 'pioneer', 'modern', 'legacy', 'pauper', 'commander', 'oathbreaker', 'vintage', 'alchemy', 'historic', 'brawl', 'historicbrawl', 'timeless']        
+        my_formatos = ['standard', 'pioneer', 'modern', 'legacy', 'pauper', 'commander', 'oathbreaker', 'vintage', 'alchemy', 'historic', 'brawl', 'historicbrawl', 'timeless']        
         legal_text = ""
 
         for formato in my_formatos:
