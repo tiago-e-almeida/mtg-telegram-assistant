@@ -50,7 +50,7 @@ def cards(update: Update, context: CallbackContext):
      
 
         legal_text = ""
-        my_formatos = ['standard', 'explorer', 'pioneer', 'modern', 'legacy', 'pauper', 'commander', 'oathbreaker', 'vintage', 'alchemy', 'historic', 'brawl', 'timeless']        
+        my_formatos = ['standard', 'pioneer', 'modern', 'legacy', 'pauper', 'commander', 'oathbreaker', 'vintage', 'alchemy', 'historic', 'brawl', 'timeless']        
         for formato in my_formatos:
             cardLegality = card.legalities()[formato]
             if(cardLegality == "banned"):
